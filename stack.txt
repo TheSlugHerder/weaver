@@ -16,6 +16,13 @@ Current project notes (2026-09-03):
 - PR: `fix/clear-secret-sample` contains env sample update and lint/test fixes; CI run in progress.
 - Recommended next actions: wait for CI to finish, then merge PR if green; address any remaining bandit findings afterwards.
 
+Security findings:
+- Bandit (run at 2026-09-03) reported 22 low-severity findings. See `bandit_low_issues.md` for details and remediation notes.
+
+TODOs:
+- Monitor CI run until passing (GitHub Actions `CI` workflow).
+- Review `bandit_low_issues.md` and remediate or document acceptable exceptions.
+
 How to run locally (quick):
 
 ```bash

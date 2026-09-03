@@ -13,3 +13,5 @@ Please do not commit local virtual environments or absolute local paths. Use a p
 - Next steps: wait for CI to finish; if it passes, merge the PR and re-enable any additional checks or hardening steps as needed.
 
 If you need me to merge the PR when CI passes, or to continue fixing any lint/security findings, tell me and I'll proceed.
+
+Security findings: Bandit reported 22 low-severity issues; see [bandit_low_issues.md](bandit_low_issues.md) for details and recommendations.
