@@ -24,9 +24,9 @@ python3.12 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 # run tests
-pytest -q
+.venv/bin/python -m pytest -q
 # run dev server with auto-reload
-uvicorn src.weaver.main:app --reload --host 127.0.0.1 --port 8000
+.venv/bin/uvicorn src.weaver.main:app --reload --host 127.0.0.1 --port 8000
 ```
 
 Open http://127.0.0.1:8000 for the API. Metrics are at `/metrics`. Health endpoints are available under `/health`.
@@ -66,7 +66,7 @@ sudo apt install -y git python3.12-venv build-essential nginx certbot python3-ce
 sudo useradd --system --create-home --home-dir /opt/weaver -s /usr/sbin/nologin weaver
 sudo mkdir -p /opt/weaver
 sudo chown weaver:weaver /opt/weaver
-sudo -u weaver git clone https://github.com/TheSlugHerder/weaver.git /opt/weaver/app
+sudo -u weaver git clone <your-repo-url> /opt/weaver/app
 cd /opt/weaver/app
 sudo -u weaver python3.12 -m venv /opt/weaver/venv
 sudo -u weaver /opt/weaver/venv/bin/pip install -r requirements.txt
