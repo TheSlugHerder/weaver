@@ -1,20 +1,17 @@
-from fastapi import FastAPI
-from fastapi.responses import JSONResponse
-from fastapi import Request
 from contextlib import asynccontextmanager
 
-from src.weaver import auth
-from src.weaver import db
-from src.weaver.routes import game as game_routes
-from src.weaver.game.worker import BackgroundWorker
-from src.weaver.config import settings
-from src.weaver import rate_limiter
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
-from starlette.middleware.trustedhost import TrustedHostMiddleware
+from fastapi.responses import JSONResponse
 from starlette.middleware.httpsredirect import HTTPSRedirectMiddleware
-from src.weaver.middleware import RequestIDMiddleware, SecurityHeadersMiddleware
+from starlette.middleware.trustedhost import TrustedHostMiddleware
+
+from src.weaver import auth, db, rate_limiter
 from src.weaver import metrics as metrics_mod
-from fastapi.responses import Response
+from src.weaver.config import settings
+from src.weaver.game.worker import BackgroundWorker
+from src.weaver.middleware import RequestIDMiddleware, SecurityHeadersMiddleware
+from src.weaver.routes import game as game_routes
 
 
 @asynccontextmanager

@@ -5,8 +5,8 @@ If `dnd_5e_core` is available in the environment, it will delegate to that
 library; otherwise it falls back to lightweight random-roll behavior so the
 engine remains functional for development and testing.
 """
-from typing import Dict, Any, Optional
 import random
+from typing import Any
 
 HAS_DND = False
 try:
@@ -16,7 +16,7 @@ except Exception:
     HAS_DND = False
 
 
-def resolve_attack(attacker: Dict[str, Any], defender: Dict[str, Any], attack_mod: int = 0) -> Dict[str, Any]:
+def resolve_attack(attacker: dict[str, Any], defender: dict[str, Any], attack_mod: int = 0) -> dict[str, Any]:
     """Resolve an attack between attacker and defender.
 
     attacker, defender: lightweight dicts containing at least keys used by
@@ -48,7 +48,7 @@ def resolve_attack(attacker: Dict[str, Any], defender: Dict[str, Any], attack_mo
     return {"roll": roll, "total": total, "ac": ac, "hit": hit, "damage": damage, "defender": defender}
 
 
-def resolve_save(subject: Dict[str, Any], dc: int, save_type: str = "dex") -> Dict[str, Any]:
+def resolve_save(subject: dict[str, Any], dc: int, save_type: str = "dex") -> dict[str, Any]:
     """Resolve a saving throw for `subject` against `dc`.
 
     Returns dict with `roll`, `total`, `success`.
@@ -66,7 +66,7 @@ def resolve_save(subject: Dict[str, Any], dc: int, save_type: str = "dex") -> Di
     return {"roll": roll, "total": total, "dc": dc, "success": success}
 
 
-def resolve_spell(caster: Dict[str, Any], targets: Any, spell_name: str, cast_mods: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+def resolve_spell(caster: dict[str, Any], targets: Any, spell_name: str, cast_mods: dict[str, Any] | None = None) -> dict[str, Any]:
     """Resolve a spell cast. Returns a descriptive result dict.
 
     This is intentionally generic: when `dnd-5e-core` is present, it will be

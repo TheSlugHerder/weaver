@@ -1,16 +1,15 @@
-from fastapi import APIRouter, FastAPI, HTTPException, Depends
-from pydantic import BaseModel, EmailStr
-from fastapi.security import OAuth2PasswordBearer
-from typing import Optional
 import time
-import secrets
-from jose import jwt, JWTError
 
-from argon2 import PasswordHasher, exceptions as argon2_exceptions
+from argon2 import PasswordHasher
+from argon2 import exceptions as argon2_exceptions
+from fastapi import APIRouter, Depends, FastAPI, HTTPException
+from fastapi.security import OAuth2PasswordBearer
+from jose import JWTError, jwt
+from pydantic import BaseModel, EmailStr
 
+from src.weaver import rate_limiter
 from src.weaver.config import settings
 from src.weaver.models.user import User
-from src.weaver import rate_limiter
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -90,7 +89,6 @@ def send_email(to: str, subject: str, body: str):
 @router.post("/register", response_model=dict)
 async def register(payload: UserCreate):
     # rate-limit by email/IP
-    from fastapi import Request
     # Request is not passed automatically; this function will rely on email key
     key = f"email:{payload.email.lower()}"
     if not await rate_limiter.allow(key, limit=10, per_seconds=60):

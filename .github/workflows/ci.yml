@@ -52,11 +52,9 @@ jobs:
         run: .venv/bin/pip install ruff bandit
 
       - name: Lint
-        if: false # temporarily disabled to allow PR merge; re-enable after fixing lint
         run: .venv/bin/ruff check src tests
 
       - name: Security scan
-        if: false # temporarily disabled to allow PR merge; re-enable after fixing issues
         run: .venv/bin/bandit -r src -lll
 
       - name: Run tests

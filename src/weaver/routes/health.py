@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
 
-from src.weaver.rate_limiter import require_redis, get_redis
+from src.weaver.rate_limiter import get_redis, require_redis
 
 router = APIRouter(prefix="/health", tags=["health"])
 

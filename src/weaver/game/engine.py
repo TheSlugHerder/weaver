@@ -1,19 +1,17 @@
-import random
-from typing import Optional
 
-from src.weaver.models.game import GameSession, PlayerState, Room
 from src.weaver.game import dnd_adapter
+from src.weaver.models.game import GameSession, PlayerState, Room
 
 
 class GameEngine:
     @staticmethod
-    async def create_session(name: str, owner_id: Optional[str] = None) -> GameSession:
+    async def create_session(name: str, owner_id: str | None = None) -> GameSession:
         session = GameSession(name=name, owner_id=owner_id, players=[], room_ids=[])
         await session.insert()
         return session
 
     @staticmethod
-    async def add_player(session_id: str, user_id: str, character_name: Optional[str] = None) -> PlayerState:
+    async def add_player(session_id: str, user_id: str, character_name: str | None = None) -> PlayerState:
         session = await GameSession.get(session_id)
         if not session:
             raise ValueError("Session not found")

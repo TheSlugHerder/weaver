@@ -1,14 +1,14 @@
-from typing import Callable, Optional
+from collections.abc import Callable
 from functools import wraps
-from fastapi import HTTPException, Request
+
+from fastapi import Depends, HTTPException, Request
 
 from src.weaver import rate_limiter
-from fastapi import Depends
 from src.weaver.auth import get_current_user
 from src.weaver.models.user import User
 
 
-def _default_key_func(user, request: Optional[Request]):
+def _default_key_func(user, request: Request | None):
     if user is not None:
         return f"user:{getattr(user, 'id', getattr(user, 'pk', str(user)))}"
     if request is not None:
@@ -18,7 +18,7 @@ def _default_key_func(user, request: Optional[Request]):
     return "anon:global"
 
 
-def rate_limit(limit: int = 30, per_seconds: int = 60, key_func: Optional[Callable] = None):
+def rate_limit(limit: int = 30, per_seconds: int = 60, key_func: Callable | None = None):
     """Decorator to apply a simple rate limit per user or IP.
 
     Usage:
@@ -72,13 +72,13 @@ def require_role(role: str):
     return decorator
 
 
-def rate_limit_dep(limit: int = 30, per_seconds: int = 60, key_func: Optional[Callable] = None):
+def rate_limit_dep(limit: int = 30, per_seconds: int = 60, key_func: Callable | None = None):
     """Dependency factory returning a FastAPI dependency that enforces rate limiting.
 
     Use in routes as: `Depends(rate_limit_dep(10, 60))`.
     """
 
-    async def _dep(request: Request, user: Optional[User] = Depends(get_current_user)):
+    async def _dep(request: Request, user: User | None = Depends(get_current_user)):
         key_f = key_func or _default_key_func
         try:
             key = key_f(user, request)
@@ -98,7 +98,7 @@ def require_role_dep(role: str):
     Use in routes as: `Depends(require_role_dep('dm'))`.
     """
 
-    async def _dep(user: Optional[User] = Depends(get_current_user)):
+    async def _dep(user: User | None = Depends(get_current_user)):
         if user is None:
             raise HTTPException(status_code=401, detail="Authentication required")
         if not (getattr(user, 'is_superuser', False) or role.lower() in [r.lower() for r in getattr(user, 'roles', [])]):

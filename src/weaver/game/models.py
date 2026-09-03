@@ -1,18 +1,19 @@
 import time
+from typing import Any
+
 from beanie import Document
 from pydantic import Field
-from typing import Optional, Dict, Any, List
 
 
 class Event(Document):
     session_id: str
-    actor_id: Optional[str]
+    actor_id: str | None
     type: str
-    payload: Dict[str, Any] = Field(default_factory=dict)
+    payload: dict[str, Any] = Field(default_factory=dict)
     status: str = "pending"  # pending | processing | done | failed
-    result: Dict[str, Any] = Field(default_factory=dict)
+    result: dict[str, Any] = Field(default_factory=dict)
     created_at: int = Field(default_factory=lambda: int(time.time()))
-    execute_at: Optional[int] = None
+    execute_at: int | None = None
 
     class Settings:
         name = "events"
@@ -20,7 +21,7 @@ class Event(Document):
 
 class TurnOrder(Document):
     session_id: str
-    order: List[str] = Field(default_factory=list)  # list of actor/user ids
+    order: list[str] = Field(default_factory=list)  # list of actor/user ids
     current_index: int = 0
 
     class Settings:

@@ -1,5 +1,6 @@
 import os
 
+
 class Settings:
     MONGO_URI: str = os.getenv("MONGO_URI", "mongodb://localhost:27017/weaver")
     SECRET_KEY: str | None = os.getenv("SECRET_KEY")
@@ -24,7 +25,8 @@ class Settings:
     HSTS_INCLUDE_SUBDOMAINS: bool = os.getenv("HSTS_INCLUDE_SUBDOMAINS", "true").lower() in ("1", "true", "yes")
 
     def ensure_secret(self):
-        import logging, os
+        import logging
+        import os
         logger = logging.getLogger("weaver.config")
         if not self.SECRET_KEY:
             if self.ENV == "production" and self.REQUIRE_SECRET_IN_PRODUCTION:

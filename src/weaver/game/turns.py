@@ -1,8 +1,7 @@
-from typing import Optional, List
 import random
 
-from src.weaver.models.game import GameSession
 from src.weaver.game.models import TurnOrder
+from src.weaver.models.game import GameSession
 
 
 class TurnManager:
@@ -19,7 +18,7 @@ class TurnManager:
         return order
 
     @staticmethod
-    async def get_current_actor(session_id: str) -> Optional[str]:
+    async def get_current_actor(session_id: str) -> str | None:
         order = await TurnOrder.find_one(TurnOrder.session_id == session_id)
         if not order or not order.order:
             return None
@@ -27,7 +26,7 @@ class TurnManager:
         return order.order[idx]
 
     @staticmethod
-    async def advance_turn(session_id: str) -> Optional[str]:
+    async def advance_turn(session_id: str) -> str | None:
         order = await TurnOrder.find_one(TurnOrder.session_id == session_id)
         if not order or not order.order:
             return None
@@ -36,7 +35,7 @@ class TurnManager:
         return order.order[order.current_index]
 
     @staticmethod
-    async def enqueue_action(session_id: str, actor_id: Optional[str], action_type: str, payload: dict, execute_at: Optional[int] = None):
+    async def enqueue_action(session_id: str, actor_id: str | None, action_type: str, payload: dict, execute_at: int | None = None):
         from src.weaver.game.models import Event
 
         evt = Event(session_id=session_id, actor_id=actor_id, type=action_type, payload=payload, execute_at=execute_at)

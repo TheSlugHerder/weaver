@@ -1,15 +1,14 @@
 import asyncio
 import time
-from typing import Optional
 
-from src.weaver.game.models import Event
 from src.weaver.game.engine import GameEngine
+from src.weaver.game.models import Event
 from src.weaver.task_queue import dequeue, get_redis
 
 
 class BackgroundWorker:
     def __init__(self, poll_interval: float = 1.0):
-        self._task: Optional[asyncio.Task] = None
+        self._task: asyncio.Task | None = None
         self._poll_interval = poll_interval
         self._running = False
 

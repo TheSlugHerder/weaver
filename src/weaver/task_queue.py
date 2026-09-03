@@ -1,5 +1,4 @@
 import os
-from typing import Optional
 
 try:
     import redis.asyncio as aioredis
@@ -8,7 +7,7 @@ except Exception:
 
 REDIS_URL = os.getenv("REDIS_URL")
 _QUEUE_KEY = os.getenv("WEAVER_QUEUE_KEY", "weaver:events")
-_redis: Optional[object] = None
+_redis: object | None = None
 
 
 async def get_redis():

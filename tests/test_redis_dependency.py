@@ -1,9 +1,9 @@
 import os
-from fastapi import FastAPI, Depends
+
+from fastapi import Depends, FastAPI
 from fastapi.testclient import TestClient
 
 from src.weaver.rate_limiter import get_redis, require_redis
-
 
 app = FastAPI()
 
