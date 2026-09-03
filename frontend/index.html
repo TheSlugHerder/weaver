@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Weaver — Frontend Skeleton</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body class="bg-gray-900 text-white">
+    <div class="min-h-screen flex flex-col">
+      <header class="bg-gray-800 p-4 flex items-center justify-between">
+        <h1 class="text-xl font-semibold">Weaver — Frontend</h1>
+        <div>
+          <button id="connectBtn" class="bg-blue-600 px-3 py-1 rounded">Connect</button>
+        </div>
+      </header>
+
+      <main class="flex-1 p-4 grid grid-cols-3 gap-4">
+        <section class="col-span-2 bg-gray-800 rounded p-3">
+          <h2 class="text-lg mb-2">Map</h2>
+          <canvas id="mapCanvas" width="800" height="600" class="bg-black rounded shadow" />
+        </section>
+
+        <aside class="bg-gray-800 rounded p-3 flex flex-col">
+          <h2 class="text-lg mb-2">Console</h2>
+          <div id="log" class="flex-1 overflow-auto text-sm font-mono bg-gray-900 p-2 rounded"></div>
+          <div class="mt-2">
+            <input id="input" class="w-full p-2 rounded text-black" placeholder="Type message to server" />
+          </div>
+        </aside>
+      </main>
+
+      <footer class="bg-gray-800 p-2 text-xs text-gray-400 text-center">
+        Static frontend skeleton — run via `python -m http.server` or any static host.
+      </footer>
+    </div>
+
+    <script src="./main.js"></script>
+  </body>
+</html>

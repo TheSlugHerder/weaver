@@ -1,0 +1,128 @@
+Project:
+	To use current existing Dungeons & Dragons digital tools as services in a core that passes natural language user game instructions (text adventure-like) to competent AI models with a collection of in-game location relevant obejct and instruction identifiers, where the AI will reply with keyword instructions matched with natural user language (supplied) and extrapolated as matching keyword instructions, thereby simplifying the understanding of user/player instructions to the game engine. By providing the AI with a restrictive set of keyword instructions, object names, etc., the aim here is to only use the AI as a translator-like assistant without daydream, hallucination, or forgetfulness. (suggest)
+	A narrator role will also be used for a second AI request by taking the resulting actions of player in-game room/environment exploration, interaction, etc., where the AI will be requested to expand upon the game's backend results (die rolls, monster actions/responses, player actions/results, object interactions and results (trap sprung, player dodged spike, etc.) in a more story-like lingual way - a narrator. (suggest)
+	The backend of the game will be set around dnd-5e-core python package linked to a document database, both of Json data structures. User accounts will also be stored in the same data/document-base (mongodb, etc.) (suggest)
+	Playing a game will require some kind of room/location/environment map data structure, and for this a Json structure of locations, objects, monster spawn points, traps, doors, room dimensions, etc., (other location data for non-dungeon locations) including entrance/exits, linked pathways, etc., to other rooms/locations. (suggest)
+	The game should be multiplayer with the option to allow other players to join game, or ignore requests, etc., typical of multiplayer gaming. (suggest)
+	Player data will also include game ID (for multiplayer and map location), character items, d&d character and game data, etc. (suggest)
+	A reverse proxy is to be implemented. (suggest)
+	The game will be presented via Web Browsers which will display map, player/team locations, fog of war, discovered areas and objects, as well as discovered/killed monsters, discovered objects/traps, etc. (suggest)
+	A security system for the game will be used (suggest)
+
+----------
+OS:
+	Ubuntu Server >= 24.04
+	
+	packages:
+		- curl
+		- gnupg
+		- git
+		- build-essential
+		- python3
+		- python3-pip
+		- python3-venv
+		- nginx
+		- ufw
+		- fail2ban
+
+Game:
+	python:
+		- fastapi
+		- uvicorn[standard]
+		- dnd-5e-core
+		- beanie
+		- motor
+		- fastapi-users[beanie]
+		- pwdlib[argon2]
+		- python-jose[cryptography]
+		- openai
+		- pydantic
+
+------------
+Expanded Stack Components
+OS & Host Security:
+	Ubuntu Server 24.04 LTS, ufw, fail2ban, etc.:
+		Host environment. ufw blocks all ports except 80/443; fail2ban bans brute-force SSH/HTTP abusers.
+
+Edge Web Server:
+	Nginx (Reverse Proxy) + Certbot:
+		Handles HTTPS certificate renewal, security headers (HSTS, CSP, CORS), and transparent Upgrade routing for WebSockets.
+
+Optional Apache Role:
+	Apache2 (or Nginx standalone):
+		If running existing Apache virtual hosts, Apache acts as the internal web proxy while Nginx sits at port 443 handling SSL and WebSocket multiplexing.
+
+App Server & Runtime:
+	Python 3.12+, FastAPI, Uvicorn (uvloop, httptools):
+		High-concurrency ASGI server managing REST routes, background tasks, and persistent WebSocket game rooms.
+
+Game Rules Engine:
+	dnd-5e-core:
+		Complete 5e combat resolver, character stats, condition flags, and bundled SRD JSON datasets.
+
+Auth & Access Control:
+	fastapi-users[beanie], pwdlib[argon2], python-jose:
+		Production-grade JWT/Cookie multi-account management [user registration, password hashing (Argon2id), email verification, and RBAC (DM vs Player roles).]
+
+Database & ODM:
+	MongoDB Community 7.0+, beanie, motor:
+		Document database for campaigns, keyed rooms, item definitions, and account profiles with async object-document mapping.
+
+AI LLM Interface:
+	openai (Async) or instructor:
+		Communicates with the external 8B endpoint (Groq, Together, DeepSeek) for zero-CPU serverless intent parsing and streamed narration.
+
+Frontend UI:
+	Tailwind CSS, HTML5 Canvas / Pixi.js, Vanilla JS / Alpine.js:
+		Tailwind: Responsive character sheets, dark-mode DM screens, turn order HUD.
+		Canvas / Pixi.js: Renders the 2D grid map, player tokens, line-of-sight, and fog of war directly in browser.
+
+----------
+Project TODO & Recommendations
+
+- Current progress (high level):
+	- Scaffold + deps: completed
+	- FastAPI core & entrypoint: completed
+	- Auth (Beanie + JWT, email verify, reset, rate-limits): completed (Argon2 hashing)
+	- Beanie models for rooms/sessions/items/monsters: completed
+	- Event queue, turn manager, background worker: completed
+	- dnd-5e-core integration (adapter + engine hooks): completed (fallbacks included)
+	- Tests (unit/async): initial suite added and passing
+
+- Immediate recommendations (safety, reliability):
+	- Set `SECRET_KEY` in environment for production (do NOT rely on auto-generated secret).
+	- Replace `send_email()` placeholder with a transactional provider (SMTP, SES, Mailgun) and add email delivery retries.
+	- Move rate-limiter to Redis (or another shared store) for horizontal scaling and durability.
+	- Run the app behind Nginx with strict TLS, HSTS, and security headers; terminate TLS at the proxy.
+	- Harden CORS, CSP, and cookie/JWT security (secure, httponly, SameSite) before public deployment.
+	- Store secrets in a secrets manager (Vault, cloud secrets) instead of environment variables where possible.
+
+- Testing & CI suggestions:
+	- Add CI pipeline (GitHub Actions / GitLab CI) to run `pytest` and linting on PRs.
+	- Add integration tests for DB-backed flows (use a MongoDB test container or ephemeral instance).
+	- Add security checks: bandit, snyk or dependabot for dependency scans.
+
+- Observability & Ops:
+	- Add structured logging (JSON) and a request ID middleware for traceability.
+	- Add metrics export (Prometheus) for queue sizes, worker loops, event processing times.
+	- Add centralized error reporting (Sentry) for runtime exceptions and worker failures.
+	- Provide systemd / Docker + docker-compose deployment manifests and Kubernetes manifests for production.
+
+- Feature suggestions (roadmap):
+	- WebSocket subscriptions for live event/results streaming to clients (recommended next step).
+	- Narrator LLM pipeline: separate LLM calls for intent parsing (translator) and story narration (narrator) with strict token/temperature controls.
+	- Permissions and roles (DM vs Player) with scoped APIs and DM controls for spawning and admin actions.
+	- Persistent event journal for replay/debug and audit (append-only event store or dedicated collection with immutability enforcement).
+	- Frontend minimal skeleton: Tailwind + Alpine or simple React/Vite starter with a Canvas area for map rendering and a WebSocket client.
+
+- Security checklist before public launch:
+	- Ensure `SECRET_KEY` and all credentials are rotated and not checked into git.
+	- Use Argon2 for password hashing (already implemented).
+	- Enable rate-limits globally including auth and public endpoints.
+	- Run dependency vulnerability scans and pin critical packages.
+	- Perform a basic threat model and penetration checklist (OWASP Top 10 review for APIs and WebSockets).
+
+If you want, I can now: (pick one)
+  - Add WebSocket subscriptions + minimal frontend skeleton (recommended next),
+  - Create CI pipeline with tests and linting, or
+  - Add Redis-backed rate limiter and durable event queue.

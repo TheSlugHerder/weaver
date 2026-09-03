@@ -1,0 +1,15 @@
+fastapi
+uvicorn[standard]
+dnd-5e-core
+beanie
+motor
+fastapi-users[beanie]
+pwdlib[argon2]
+python-jose[cryptography]
+openai
+pydantic
+pytest
+httpx
+pytest-asyncio
+redis
+prometheus_client

@@ -1,0 +1,75 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.12]
+    services:
+      redis:
+        image: redis:7
+        ports: ['6379:6379']
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      REDIS_URL: redis://127.0.0.1:6379/0
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Cache pip
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: Install dependencies
+        run: |
+          python -m venv .venv
+          .venv/bin/python -m pip install --upgrade pip setuptools wheel
+          .venv/bin/pip install -r requirements.txt
+
+      - name: Install dev tools (linters & security)
+        run: .venv/bin/pip install ruff bandit
+
+      - name: Lint
+        run: .venv/bin/ruff check src tests
+
+      - name: Security scan
+        run: .venv/bin/bandit -r src -lll
+
+      - name: Run tests
+        run: .venv/bin/python -m pytest -q
+
+      - name: Start app (background)
+        run: |
+          .venv/bin/python -m uvicorn src.weaver.main:app --host 127.0.0.1 --port 8000 &
+          # wait for server to start
+          sleep 3
+
+      - name: Verify health endpoints
+        run: |
+          # check strict Redis health (should be OK in CI since redis service is provided)
+          curl --fail http://127.0.0.1:8000/health/redis
+          # check metrics endpoint contains our metrics
+          curl --fail http://127.0.0.1:8000/metrics | grep weaver_redis_up
+          curl --fail http://127.0.0.1:8000/metrics | grep weaver_rate_limiter_fallbacks_total || true
