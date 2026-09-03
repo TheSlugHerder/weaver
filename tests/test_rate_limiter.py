@@ -1,6 +1,6 @@
 import asyncio
 
-from weaver import rate_limiter as rl
+from src.weaver import rate_limiter as rl
 
 
 def test_in_memory_rate_limiter():

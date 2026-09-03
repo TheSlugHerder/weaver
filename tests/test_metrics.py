@@ -1,4 +1,4 @@
-from weaver import metrics
+from src.weaver import metrics
 
 
 def test_metrics_module_exports():
