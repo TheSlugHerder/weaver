@@ -36,6 +36,9 @@ htmlcov/
 # VS Code
 .vscode/
 
+# Local env file (do NOT commit real secrets)
+.env
+
 # System files
 .DS_Store
 thumbs.db
