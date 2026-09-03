@@ -1,5 +1,5 @@
-from prometheus_client import Counter, Gauge, generate_latest, CONTENT_TYPE_LATEST
 from fastapi.responses import Response
+from prometheus_client import CONTENT_TYPE_LATEST, Counter, Gauge, generate_latest
 
 # Metrics
 redis_up = Gauge('weaver_redis_up', 'Redis availability (1=up,0=down)')

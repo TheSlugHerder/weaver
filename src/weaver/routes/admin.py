@@ -1,11 +1,11 @@
+
 from fastapi import APIRouter, Depends, HTTPException
-from typing import List
 from pydantic import BaseModel
 
-from src.weaver.models.user import User
-from src.weaver.decorators import require_role_dep
-from src.weaver.auth import get_current_user
 from src.weaver import hooks
+from src.weaver.auth import get_current_user
+from src.weaver.decorators import require_role_dep
+from src.weaver.models.user import User
 from src.weaver.rate_limiter import get_redis
 
 router = APIRouter(prefix="/admin", tags=["admin"])

@@ -1,6 +1,6 @@
+
 from beanie import Document
 from pydantic import EmailStr
-from typing import Optional, List
 
 
 class User(Document):
@@ -10,7 +10,7 @@ class User(Document):
     is_superuser: bool = False
     is_verified: bool = False
     # Roles allows flexible permission checks, e.g. ['dm', 'admin']
-    roles: List[str] = []
+    roles: list[str] = []
 
     class Settings:
         name = "users"

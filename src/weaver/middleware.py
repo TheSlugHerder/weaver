@@ -1,11 +1,10 @@
-import uuid
 import logging
-from typing import Callable
-
-from starlette.types import ASGIApp, Receive, Scope, Send
-from starlette.middleware.base import BaseHTTPMiddleware
+import uuid
+from collections.abc import Callable
 
 from fastapi import Request
+from starlette.middleware.base import BaseHTTPMiddleware
+from starlette.types import ASGIApp
 
 LOGGER = logging.getLogger("weaver.middleware")
 

@@ -1,13 +1,13 @@
+from typing import Any
+
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
-from typing import Optional
 
-from src.weaver.game.engine import GameEngine
 from src.weaver.auth import get_current_user
-from src.weaver.models.user import User
-from src.weaver.game.turns import TurnManager
 from src.weaver.decorators import rate_limit_dep, require_role_dep
-from typing import Dict, Any
+from src.weaver.game.engine import GameEngine
+from src.weaver.game.turns import TurnManager
+from src.weaver.models.user import User
 
 router = APIRouter(prefix="/game", tags=["game"])
 
@@ -17,7 +17,7 @@ class CreateSessionPayload(BaseModel):
 
 
 class JoinPayload(BaseModel):
-    character_name: Optional[str] = None
+    character_name: str | None = None
 
 
 class AttackPayload(BaseModel):
@@ -27,7 +27,7 @@ class AttackPayload(BaseModel):
 
 class ActionPayload(BaseModel):
     type: str
-    payload: Dict[str, Any] = {}
+    payload: dict[str, Any] = {}
 
 
 @router.post("/create")

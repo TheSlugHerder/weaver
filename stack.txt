@@ -1,0 +1,35 @@
+Stack: Weaver (brief)
+
+- Language: Python 3.12
+- Web framework: FastAPI
+- ASGI server: Uvicorn
+- Redis: redis.asyncio (used for rate limiter; CI provides redis service)
+- Database: MongoDB (Motor + Beanie)
+- Metrics: prometheus_client (exposes /metrics)
+- Testing: pytest, pytest-asyncio
+- Linters / Security: ruff, bandit
+- CI: GitHub Actions (workflow: .github/workflows/ci.yml)
+
+Current project notes (2026-09-03):
+- Re-enabled lint and security checks in CI; ran `ruff --fix` and applied fixes.
+- Local test run: 16 passed, 1 skipped.
+- PR: `fix/clear-secret-sample` contains env sample update and lint/test fixes; CI run in progress.
+- Recommended next actions: wait for CI to finish, then merge PR if green; address any remaining bandit findings afterwards.
+
+Security findings:
+- Bandit (run at 2026-09-03) reported 22 low-severity findings. See `bandit_low_issues.md` for details and remediation notes.
+
+TODOs:
+- Monitor CI run until passing (GitHub Actions `CI` workflow).
+- Review `bandit_low_issues.md` and remediate or document acceptable exceptions.
+
+How to run locally (quick):
+
+```bash
+python3 -m venv .venv
+.venv/bin/python -m pip install -r requirements.txt
+.venv/bin/pip install ruff bandit
+.venv/bin/python -m pytest -q
+```
+
+If you want me to merge the PR on success, say "merge when green".

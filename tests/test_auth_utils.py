@@ -1,6 +1,6 @@
 import pytest
-from src.weaver import auth
-from src.weaver import rate_limiter
+
+from src.weaver import auth, rate_limiter
 
 
 def test_hash_and_verify_password():

@@ -232,3 +232,87 @@ Prometheus will scrape `/metrics` automatically.
 
 ---
 Documentation created for basic production deployment and local usage.
+
+## Exact deploy commands (one-shot)
+
+Run these on the target Ubuntu server (replace placeholders like `example.com`, `MONGO_URI`, and secrets before running):
+
+1) Install packages and prerequisites
+
+```bash
+sudo apt update
+sudo apt install -y git python3.12-venv build-essential nginx certbot python3-certbot-nginx redis-server
+# Install MongoDB using official instructions or use a managed service
+```
+
+2) Create the `weaver` user, directories, copy the repo, and create a venv
+
+```bash
+sudo useradd --system --no-create-home --shell /usr/sbin/nologin weaver || true
+sudo mkdir -p /srv/weaver
+sudo mkdir -p /var/log/weaver
+sudo mkdir -p /etc/weaver
+sudo chown -R weaver:weaver /srv/weaver /var/log/weaver /etc/weaver
+
+# Copy files from your build artifact or repo (run from your dev machine or CI runner):
+# sudo rsync -a --delete --chown=weaver:weaver /path/to/checkout/ /srv/weaver/
+
+sudo -u weaver bash -lc "python3 -m venv /srv/weaver/.venv"
+sudo -u weaver bash -lc "/srv/weaver/.venv/bin/python -m pip install --upgrade pip setuptools wheel"
+sudo -u weaver bash -lc "/srv/weaver/.venv/bin/pip install -r /srv/weaver/requirements.txt"
+```
+
+3) Create the environment file and secure it
+
+```bash
+sudo tee /etc/weaver/weaver.env > /dev/null <<'EOF'
+SECRET_KEY=$(openssl rand -hex 32)
+MONGO_URI=mongodb://user:pass@mongo-host:27017/weaver
+REDIS_URL=redis://127.0.0.1:6379/0
+ENV=production
+ALLOWED_HOSTS=example.com
+FORCE_HTTPS=true
+# Add other env vars as needed
+EOF
+
+sudo chown weaver:weaver /etc/weaver/weaver.env
+sudo chmod 600 /etc/weaver/weaver.env
+```
+
+4) Install the systemd unit and start the service
+
+```bash
+sudo cp /srv/weaver/deploy/weaver.service /etc/systemd/system/weaver.service
+sudo systemctl daemon-reload
+sudo systemctl enable --now weaver
+sudo systemctl status --no-pager weaver
+sudo journalctl -u weaver -f
+```
+
+5) Install nginx, enable the site, and obtain TLS certs
+
+```bash
+sudo apt-get install -y nginx certbot python3-certbot-nginx
+sudo cp /srv/weaver/deploy/nginx-weaver.conf /etc/nginx/sites-available/weaver.conf
+sudo ln -fs /etc/nginx/sites-available/weaver.conf /etc/nginx/sites-enabled/weaver.conf
+sudo nginx -t
+sudo systemctl reload nginx
+
+# Replace example.com with your domain, then request a cert (interactive)
+sudo certbot --nginx -d example.com
+```
+
+6) Verify the deployment
+
+```bash
+# Local service check
+curl -I http://127.0.0.1:8000/health
+
+# External check via nginx/TLS
+curl -I https://example.com/health
+```
+
+Notes:
+- If you use a different deployment path, update the `weaver.service` `WorkingDirectory` and `ExecStart` to point to the correct virtualenv and app location.
+- Ensure `MONGO_URI` and `REDIS_URL` are set to secure, internal endpoints where possible.
+- Adjust firewall rules to expose only ports 80/443 externally and keep DB ports private.

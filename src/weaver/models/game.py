@@ -1,21 +1,21 @@
+
 from beanie import Document
 from pydantic import BaseModel, Field
-from typing import List, Optional
 
 
 class Item(BaseModel):
     name: str
-    description: Optional[str] = None
+    description: str | None = None
     quantity: int = 1
-    keywords: List[str] = Field(default_factory=list)
+    keywords: list[str] = Field(default_factory=list)
 
 
 class Monster(BaseModel):
     name: str
-    cr: Optional[float] = None
-    hp: Optional[int] = None
-    ac: Optional[int] = None
-    keywords: List[str] = Field(default_factory=list)
+    cr: float | None = None
+    hp: int | None = None
+    ac: int | None = None
+    keywords: list[str] = Field(default_factory=list)
 
 
 class Exit(BaseModel):
@@ -25,11 +25,11 @@ class Exit(BaseModel):
 
 class Room(Document):
     name: str
-    description: Optional[str] = None
-    tags: List[str] = Field(default_factory=list)
-    exits: List[Exit] = Field(default_factory=list)
-    items: List[Item] = Field(default_factory=list)
-    monsters: List[Monster] = Field(default_factory=list)
+    description: str | None = None
+    tags: list[str] = Field(default_factory=list)
+    exits: list[Exit] = Field(default_factory=list)
+    items: list[Item] = Field(default_factory=list)
+    monsters: list[Monster] = Field(default_factory=list)
 
     class Settings:
         name = "rooms"
@@ -37,17 +37,17 @@ class Room(Document):
 
 class PlayerState(BaseModel):
     user_id: str
-    character_name: Optional[str] = None
-    hp: Optional[int] = None
-    location_room_id: Optional[str] = None
-    inventory: List[Item] = Field(default_factory=list)
+    character_name: str | None = None
+    hp: int | None = None
+    location_room_id: str | None = None
+    inventory: list[Item] = Field(default_factory=list)
 
 
 class GameSession(Document):
     name: str
-    owner_id: Optional[str] = None
-    players: List[PlayerState] = []
-    room_ids: List[str] = []
+    owner_id: str | None = None
+    players: list[PlayerState] = []
+    room_ids: list[str] = []
 
     class Settings:
         name = "sessions"

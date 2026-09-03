@@ -1,0 +1,49 @@
+[Unit]
+Description=Weaver FastAPI application
+After=network.target
+Wants=network-online.target
+
+[Service]
+# Run as a non-privileged user created for the app (create with `useradd --system weaver`)
+User=weaver
+Group=weaver
+
+# Directory where your app is deployed (adjust to your deploy path)
+WorkingDirectory=/srv/weaver
+
+# Environment file with secrets and config (create at /etc/weaver/weaver.env)
+EnvironmentFile=/etc/weaver/weaver.env
+
+# ExecStart should point to the virtualenv python/uvicorn install used in deploy
+# Adjust worker count, host/port and options as appropriate.
+ExecStart=/srv/weaver/.venv/bin/uvicorn src.weaver.main:app --host 127.0.0.1 --port 8000 --proxy-headers
+
+Restart=on-failure
+RestartSec=5s
+KillMode=process
+TimeoutStopSec=20s
+
+# Resource limits
+LimitNOFILE=65536
+LimitNPROC=512
+
+# Security hardening
+PrivateTmp=true
+ProtectSystem=full
+ProtectHome=true
+NoNewPrivileges=true
+ProtectKernelTunables=true
+ProtectControlGroups=true
+ProtectKernelModules=true
+
+# Allow writing logs and the environment file
+ReadWritePaths=/etc/weaver
+ReadWritePaths=/var/log/weaver
+
+[Install]
+WantedBy=multi-user.target
+
+# Notes:
+# - Create the `weaver` system user and place your app at /srv/weaver (or change WorkingDirectory).
+# - Place secrets in /etc/weaver/weaver.env and set strict permissions (owner weaver:weaver, mode 600).
+# - Reload systemd after installing: `sudo systemctl daemon-reload` then `sudo systemctl enable --now weaver`.

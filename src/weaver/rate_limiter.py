@@ -1,10 +1,9 @@
-import time
 import asyncio
 import logging
-from typing import Optional
+import time
 
-from src.weaver.config import settings
 from src.weaver import metrics as metrics_mod
+from src.weaver.config import settings
 
 try:
     import redis.asyncio as aioredis
@@ -14,7 +13,7 @@ except Exception:
     RedisError = Exception
 
 # Redis client may not be available at import time; keep untyped to avoid referencing aioredis when absent
-_redis: Optional[object] = None
+_redis: object | None = None
 
 # Rate limiter config
 KEY_PREFIX = "ratelimit:"
@@ -111,7 +110,7 @@ except Exception:
     RedisClient = object
 
 
-async def get_redis(request=None) -> Optional[RedisClient]:
+async def get_redis(request=None) -> RedisClient | None:
     """FastAPI dependency: returns the Redis client if available, otherwise None.
 
     Usage in route: `redis = Depends(get_redis)`

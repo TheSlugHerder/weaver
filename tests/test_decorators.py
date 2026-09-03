@@ -1,9 +1,9 @@
-import pytest
 from types import SimpleNamespace
+
+import pytest
 from fastapi import HTTPException
 
-from src.weaver import decorators
-from src.weaver import rate_limiter
+from src.weaver import decorators, rate_limiter
 
 
 @pytest.mark.asyncio
