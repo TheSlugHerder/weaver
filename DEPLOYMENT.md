@@ -126,6 +126,21 @@ sudo systemctl status weaver.service
 sudo journalctl -u weaver -f
 ```
 
+Systemd hardening (recommended)
+
+You can add a few simple hardening options to the `[Service]` section to reduce the impact of a compromise. Add these lines to `/etc/systemd/system/weaver.service` inside the `[Service]` block:
+
+```
+ProtectSystem=full
+ProtectHome=true
+PrivateTmp=true
+NoNewPrivileges=true
+# Drop additional capabilities if not needed; keep minimal privileges
+AmbientCapabilities=
+```
+
+These options help isolate the process, prevent access to most of the filesystem, and disable privilege escalation. Keep `EnvironmentFile=/etc/weaver/weaver.env` as shown above (root-owned, 640) so secrets remain protected.
+
 5. Nginx reverse proxy and TLS (example)
 
 Create an Nginx site file `/etc/nginx/sites-available/weaver`:
